@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Letter of Intent Generator</title>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: #f5f5f5;
+    }
+
+    /* Admin Panel Styles */
+    .admin-panel {
+      background-color: #2c3e50;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .admin-panel h1 {
+      font-size: 1.5rem;
+    }
+
+    .admin-toggle {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .admin-toggle:hover {
+      background-color: #2980b9;
+    }
+
+    .admin-container {
+      display: none;
+      background-color: #ecf0f1;
+      padding: 1rem;
+      border-bottom: 1px solid #bdc3c7;
+    }
+
+    .admin-container.show {
+      display: block;
+    }
+
+    .admin-form {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #bdc3c7;
+      border-radius: 4px;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .form-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn-primary {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #2980b9;
+    }
+
+    .btn-secondary {
+      background-color: #95a5a6;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background-color: #7f8c8d;
+    }
+
+    .btn-info {
+      background-color: #17a2b8;
+      color: white;
+    }
+
+    .btn-info:hover {
+      background-color: #138496;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .product-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+
+    .product-table th, .product-table td {
+      border: 1px solid #bdc3c7;
+      padding: 0.5rem;
+    }
+
+    .product-table th {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .product-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    .btn-danger {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #c0392b;
+    }
+
+    .btn-success {
+      background-color: #2ecc71;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background-color: #27ae60;
+    }
+
+    /* Preview Container */
+    .preview-container {
+      padding: 1rem;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin: 1rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    /* Letter Styles */
+    /* Header styles */
+    .letter-header {
+      background-color: #008080;
+      color: white;
+      padding: 1.5rem;
+    }
+
+    .letter-container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo-container {
+      background-color: white;
+      border-radius: 50%;
+      padding: 0.25rem;
+      width: 4rem;
+      height: 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo {
+      width: 13rem;
+      height: 4rem;
+      object-fit: contain;
+    }
+
+    .company-name {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .person-name {
+      font-size: 0.875rem;
+    }
+
+    .contact-section {
+      display: flex;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .contact-label {
+      background-color: white;
+      color: black;
+      padding: 0.5rem 1.5rem;
+      border-top-left-radius: 9999px;
+      border-bottom-left-radius: 9999px;
+      font-weight: bold;
+    }
+
+    .contact-info {
+      background-color: white;
+      color: black;
+      padding: 0.5rem 1.5rem;
+      border-top-right-radius: 9999px;
+      border-bottom-right-radius: 9999px;
+      margin-left: 1rem;
+    }
+
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .contact-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .contact-icon {
+      color: #4b5563;
+    }
+
+    .contact-text {
+      font-size: 0.875rem;
+    }
+
+    /* Main content styles */
+    .letter-main {
+      flex: 1;
+      padding: 1.5rem;
+    }
+
+    .address-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .address-heading {
+      font-weight: bold;
+      font-size: 1.125rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .address-line {
+      margin-bottom: 0.25rem;
+    }
+
+    .letter-title {
+      font-size: 1.875rem;
+      font-weight: bold;
+      text-align: center;
+      margin: 1.5rem 0;
+    }
+
+    .letter-content {
+      text-align: justify;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    .underline {
+      text-decoration: underline;
+    }
+
+    /* Table styles */
+    .table-container {
+      overflow-x: auto;
+      margin: 1.5rem 0 2rem 0;
+    }
+
+    table {
+      min-width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #d1d5db;
+      padding: 0.5rem;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f3f4f6;
+    }
+
+    /* Footer styles */
+    .letter-footer {
+      background-color: #008080;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    /* Responsive styles */
+    @media (min-width: 768px) {
+      .header-content {
+        flex-direction: row;
+      }
+
+      .contact-section {
+        margin-top: 0;
+      }
+
+      .address-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .admin-form {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      .admin-panel, .admin-container, .preview-container {
+        display: none !important;
+      }
+
+      body {
+        background-color: white;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Admin Panel -->
+  <div class="admin-panel">
+    <h1>Letter of Intent Admin</h1>
+    <button class="admin-toggle" id="adminToggle">Toggle Admin Panel</button>
+  </div>
+
+  <div class="admin-container" id="adminContainer">
+    <div class="admin-form">
+      <div class="form-group">
+        <label for="fromCompany">From Company</label>
+        <input type="text" id="fromCompany" value="ARZHAM SUPPLIES">
+      </div>
+      <div class="form-group">
+        <label for="fromAddress1">From Address Line 1</label>
+        <input type="text" id="fromAddress1" value="08 Jalauddin 5, Bandar Sultan Suleiman,">
+      </div>
+      <div class="form-group">
+        <label for="fromAddress2">From Address Line 2</label>
+        <input type="text" id="fromAddress2" value="5600 Pelabuhan Selangor, Malaysia">
+      </div>
+      <div class="form-group">
+        <label for="fromContact">From Contact</label>
+        <input type="text" id="fromContact" value="contact - +60165535136">
+      </div>
+      <div class="form-group">
+        <label for="fromEmail">From Email</label>
+        <input type="text" id="fromEmail" value="purchased.arzhamsupplies@yahoo.com">
+      </div>
+
+      <div class="form-group">
+        <label for="toCompany">To Company</label>
+        <input type="text" id="toCompany" value="KMR INTERNATIONAL TRAD">
+      </div>
+      <div class="form-group">
+        <label for="toAddress1">To Address Line 1</label>
+        <input type="text" id="toAddress1" value="Add : #35-489/2, Purushothama Patnam, G.T.">
+      </div>
+      <div class="form-group">
+        <label for="toAddress2">To Address Line 2</label>
+        <input type="text" id="toAddress2" value="Road, NH-16, CHILAKALURIPET -522616,">
+      </div>
+      <div class="form-group">
+        <label for="toAddress3">To Address Line 3</label>
+        <input type="text" id="toAddress3" value="Palnadu Dist., Andhrapradesh">
+      </div>
+      <div class="form-group">
+        <label for="toContact">To Contact</label>
+        <input type="text" id="toContact" value="Contact No.+91-95158 79383">
+      </div>
+
+      <div class="form-group">
+        <label for="letterContent1">Letter Content Paragraph 1</label>
+        <textarea id="letterContent1">We Take The Opportunity To Declare Our Intention To purchase some goods from our company. Our company is duly organized and exists under the laws of Malaysia. The principal business address of our company is 08 Jalauddin 5, Bandar Sultan Suleiman, 5600 Pelabuhan Selangor, Malaysia. Our principal activities include paint and-sip services for our customers. In line with the above-stated, we, ARZHAM SUPPLIES, hereby confirm with all responsibility that we are willing and able to enter into a contract for the purchase of the following items, as specified below:</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="letterContent2">Letter Content Paragraph 2</label>
+        <textarea id="letterContent2">Note you can Delivered the same quantity, in one or more parts, within 90 days,
+Required Documents Necessary In Export Business (Like global rating GOVT.Approval)along with Credibility Letter.</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="letterContent3">Letter Content Paragraph 3</label>
+        <textarea id="letterContent3">Sourcing port:-JNPT , Mumbai ( India ).
+Destination point: Kuching ( Malaysia )
+Delivery terms: FOB: JNPT, Mumbai (India)</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="letterContent4">Letter Content Paragraph 4</label>
+        <textarea id="letterContent4">method: 80% Advanced & Rest of 20% against B/L</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="letterContent5">Letter Content Paragraph 5</label>
+        <textarea id="letterContent5">We understand that this letter of intent is a starting point for further negotiations and operates as a framework under which the transaction can proceed.</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="letterContent6">Letter Content Paragraph 6</label>
+        <textarea id="letterContent6">We look forward to working with you on the proposal, hopefully beneficial for both entities</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="signatoryName">Signatory Name</label>
+        <input type="text" id="signatoryName" value="Mohd. Aiman">
+      </div>
+
+      <div class="form-group">
+        <label for="signatoryTitle">Signatory Title</label>
+        <input type="text" id="signatoryTitle" value="Purchased Manager of the ARZHAM SUPPLIES">
+      </div>
+
+      <div class="form-group">
+        <label for="footerAddress">Footer Address</label>
+        <textarea id="footerAddress">08 JALAUDDIN 5, BANDAR SULTAN SULEIMAN, 5600 PELABUHAN SELANGOR, MALAYSIA</textarea>
+      </div>
+
+      <!-- Products Table -->
+      <div class="form-group" style="grid-column: 1 / -1;">
+        <label>Products</label>
+        <table class="product-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Amount</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productsTableBody">
+            <tr>
+              <td><input type="text" class="product-name" value="chilli powder"></td>
+              <td><input type="text" class="product-quantity" value="65 MT"></td>
+              <td><input type="text" class="product-price" value="₹75/KG"></td>
+              <td><input type="text" class="product-amount" value="₹1,13,750.00"></td>
+              <td>
+                <div class="product-actions">
+                  <button class="btn-sm btn-danger remove-product">Remove</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="text" class="product-name" value="turmeric powder"></td>
+              <td><input type="text" class="product-quantity" value="70 MT"></td>
+              <td><input type="text" class="product-price" value="₹70/KG"></td>
+              <td><input type="text" class="product-amount" value="₹ 1,19,000.00"></td>
+              <td>
+                <div class="product-actions">
+                  <button class="btn-sm btn-danger remove-product">Remove</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <button class="btn-sm btn-success" id="addProduct">Add Product</button>
+      </div>
+
+      <div class="form-actions" style="grid-column: 1 / -1;">
+        <button class="form-btn btn-primary" id="updatePreview">Update Preview</button>
+        <button class="form-btn btn-info" id="downloadImage">Download as Image</button>
+        <button class="form-btn btn-secondary" id="printLetter">Print Letter</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview Container -->
+  <div class="preview-container">
+    <button class="form-btn btn-primary" id="printPreview">Print Preview</button>
+    <button class="form-btn btn-info" id="downloadPreview">Download as Image</button>
+  </div>
+
+  <!-- Letter Preview -->
+  <div id="letterPreview">
+    <!-- Header -->
+    <header class="letter-header">
+      <div class="letter-container">
+        <div class="header-content">
+          <div class="logo-section">
+            <div class="logo-container">
+              <img src="https://arzhamsupplies.weebly.com/uploads/1/5/2/8/152805646/l01.png" alt="Arzham Supplies Logo" class="logo">
+            </div>
+            <div>
+              <h1 class="company-name">ARZHAM SUPPLIES</h1>
+              <p class="person-name">MOHD AIMAN</p>
+            </div>
+          </div>
+
+          <div class="contact-section">
+            <div class="contact-label">
+              <span>CONTACT US</span>
+            </div>
+            <div class="contact-info">
+              <div class="contact-row">
+                <svg class="contact-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                </svg>
+                <a href="mailto:purchased.arzhamsupplies@yahoo.com" class="contact-text">
+                  purchased.arzhamsupplies@yahoo.com
+                </a>
+              </div>
+              <div class="contact-row">
+                <svg class="contact-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+                <span class="contact-text">+60165535136</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="letter-main letter-container">
+      <div class="address-grid">
+        <!-- Left Column - From -->
+        <div>
+          <h2 class="address-heading" id="previewFromCompany">FROM: ARZHAM SUPPLIES</h2>
+          <p class="address-line" id="previewFromAddress1">08 Jalauddin 5, Bandar Sultan Suleiman,</p>
+          <p class="address-line" id="previewFromAddress2">5600 Pelabuhan Selangor, Malaysia</p>
+          <p class="address-line" id="previewFromContact">contact - +60165535136</p>
+          <p class="address-line">
+            Email -
+            <a href="mailto:purchased.arzhamsupplies@yahoo.com" class="underline" id="previewFromEmail">
+              purchased.arzhamsupplies@yahoo.com
+            </a>
+          </p>
+        </div>
+
+        <!-- Right Column - To -->
+        <div>
+          <h2 class="address-heading" id="previewToCompany">TO: KMR INTERNATIONAL TRAD</h2>
+          <p class="address-line" id="previewToAddress1">Add : #35-489/2, Purushothama Patnam, G.T.</p>
+          <p class="address-line" id="previewToAddress2">Road, NH-16, CHILAKALURIPET -522616,</p>
+          <p class="address-line" id="previewToAddress3">Palnadu Dist., Andhrapradesh</p>
+          <p class="address-line" id="previewToContact">Contact No.+91-95158 79383</p>
+        </div>
+      </div>
+
+      <div>
+        <p class="bold address-line">DEAR SIR/MADAM,</p>
+
+        <h1 class="letter-title">LETTER OF INTENT</h1>
+
+        <p class="letter-content" id="previewContent1">
+          We Take The Opportunity To Declare Our Intention To purchase some goods from our company. Our company is
+          duly organized and exists under the laws of Malaysia. The principal business address of our company is 08
+          Jalauddin 5, Bandar Sultan Suleiman, 5600 Pelabuhan Selangor, Malaysia. Our principal activities include
+          paint and-sip services for our customers. In line with the above-stated, we,
+          <span class="bold">ARZHAM SUPPLIES</span>, hereby confirm with all responsibility that we are
+          willing and able to enter into a contract for the purchase of the following items, as specified below:
+        </p>
+
+        <!-- Table -->
+        <div class="table-container">
+          <table id="previewProductsTable">
+            <thead>
+              <tr>
+                <th>Products</th>
+                <th>Quantity</th>
+                <th>Price per piece</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>chilli powder</td>
+                <td>65 MT</td>
+                <td>₹75/KG</td>
+                <td>₹1,13,750.00</td>
+              </tr>
+              <tr>
+                <td>turmeric powder</td>
+                <td>70 MT</td>
+                <td>₹70/KG</td>
+                <td>₹ 1,19,000.00</td>
+              </tr>
+              <tr>
+                <td colspan="3">Total</td>
+                <td class="bold">₹ 2,45,85,750</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="letter-content" id="previewContent2">
+          Note you can Delivered the same quantity, in one or more parts, within 90 days,<br>
+          Required Documents Necessary In Export Business (Like global rating GOVT.Approval)along with Credibility
+          Letter.
+        </p>
+
+        <p class="letter-content" id="previewContent3">
+          Sourcing port:-JNPT , Mumbai ( India ).<br>
+          Destination point: Kuching ( Malaysia )<br>
+          Delivery terms: FOB: JNPT, Mumbai (India)
+        </p>
+
+        <p class="letter-content" id="previewContent4">method: 80% Advanced & Rest of 20% against B/L</p>
+
+        <p class="letter-content" id="previewContent5">
+          We understand that this letter of intent is a starting point for further negotiations and operates as a
+          framework under which the transaction can proceed.
+        </p>
+
+        <p class="letter-content" id="previewContent6">
+          We look forward to working with you on the proposal, hopefully beneficial for both entities<br>
+          Respectfully,<br>
+          <span class="bold" id="previewSignatoryName">Mohd. Aiman</span><br>
+          <span id="previewSignatoryTitle">Purchased Manager of the <span class="bold">ARZHAM SUPPLIES</span></span>
+        </p>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="letter-footer">
+      <p id="previewFooterAddress">08 JALAUDDIN 5, BANDAR SULTAN SULEIMAN, 5600 PELABUHAN SELANGOR, MALAYSIA</p>
+    </footer>
+  </div>
+
+  <!-- Include html2canvas library for image download functionality -->
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Toggle admin panel
+      const adminToggle = document.getElementById('adminToggle');
+      const adminContainer = document.getElementById('adminContainer');
+      
+      adminToggle.addEventListener('click', function() {
+        adminContainer.classList.toggle('show');
+      });
+
+      // Add product row
+      const addProductBtn = document.getElementById('addProduct');
+      const productsTableBody = document.getElementById('productsTableBody');
+      
+      addProductBtn.addEventListener('click', function() {
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+          <td><input type="text" class="product-name" placeholder="Product name"></td>
+          <td><input type="text" class="product-quantity" placeholder="Quantity"></td>
+          <td><input type="text" class="product-price" placeholder="Price"></td>
+          <td><input type="text" class="product-amount" placeholder="Amount"></td>
+          <td>
+            <div class="product-actions">
+              <button class="btn-sm btn-danger remove-product">Remove</button>
+            </div>
+          </td>
+        `;
+        productsTableBody.appendChild(newRow);
+        
+        // Add event listener to the new remove button
+        newRow.querySelector('.remove-product').addEventListener('click', function() {
+          productsTableBody.removeChild(newRow);
+        });
+      });
+
+      // Remove product row (for existing rows)
+      document.querySelectorAll('.remove-product').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const row = this.closest('tr');
+          productsTableBody.removeChild(row);
+        });
+      });
+
+      // Update preview
+      const updatePreviewBtn = document.getElementById('updatePreview');
+      
+      updatePreviewBtn.addEventListener('click', function() {
+        // Update from section
+        document.getElementById('previewFromCompany').textContent = 'FROM: ' + document.getElementById('fromCompany').value;
+        document.getElementById('previewFromAddress1').textContent = document.getElementById('fromAddress1').value;
+        document.getElementById('previewFromAddress2').textContent = document.getElementById('fromAddress2').value;
+        document.getElementById('previewFromContact').textContent = document.getElementById('fromContact').value;
+        document.getElementById('previewFromEmail').textContent = document.getElementById('fromEmail').value;
+        document.getElementById('previewFromEmail').href = 'mailto:' + document.getElementById('fromEmail').value;
+        
+        // Update to section
+        document.getElementById('previewToCompany').textContent = 'TO: ' + document.getElementById('toCompany').value;
+        document.getElementById('previewToAddress1').textContent = document.getElementById('toAddress1').value;
+        document.getElementById('previewToAddress2').textContent = document.getElementById('toAddress2').value;
+        document.getElementById('previewToAddress3').textContent = document.getElementById('toAddress3').value;
+        document.getElementById('previewToContact').textContent = document.getElementById('toContact').value;
+        
+        // Update content paragraphs
+        document.getElementById('previewContent1').innerHTML = document.getElementById('letterContent1').value
+          .replace('ARZHAM SUPPLIES', '<span class="bold">ARZHAM SUPPLIES</span>');
+        document.getElementById('previewContent2').textContent = document.getElementById('letterContent2').value;
+        document.getElementById('previewContent3').textContent = document.getElementById('letterContent3').value;
+        document.getElementById('previewContent4').textContent = document.getElementById('letterContent4').value;
+        document.getElementById('previewContent5').textContent = document.getElementById('letterContent5').value;
+        document.getElementById('previewContent6').innerHTML = document.getElementById('letterContent6').value + 
+          '<br>Respectfully,<br><span class="bold">' + document.getElementById('signatoryName').value + '</span><br>' + 
+          document.getElementById('signatoryTitle').value;
+        
+        // Update footer
+        document.getElementById('previewFooterAddress').textContent = document.getElementById('footerAddress').value;
+        
+        // Update signatory
+        document.getElementById('previewSignatoryName').textContent = document.getElementById('signatoryName').value;
+        document.getElementById('previewSignatoryTitle').innerHTML = document.getElementById('signatoryTitle').value;
+        
+        // Update products table
+        const previewTable = document.getElementById('previewProductsTable').querySelector('tbody');
+        previewTable.innerHTML = '';
+        
+        let totalAmount = 0;
+        
+        document.querySelectorAll('#productsTableBody tr').forEach(row => {
+          const productName = row.querySelector('.product-name').value;
+          const quantity = row.querySelector('.product-quantity').value;
+          const price = row.querySelector('.product-price').value;
+          const amount = row.querySelector('.product-amount').value;
+          
+          // Try to extract numeric value from amount for total calculation
+          const amountValue = parseFloat(amount.replace(/[^0-9.]/g, '')) || 0;
+          totalAmount += amountValue;
+          
+          const newRow = document.createElement('tr');
+          newRow.innerHTML = `
+            <td>${productName}</td>
+            <td>${quantity}</td>
+            <td>${price}</td>
+            <td>${amount}</td>
+          `;
+          previewTable.appendChild(newRow);
+        });
+        
+        // Add total row
+        const totalRow = document.createElement('tr');
+        totalRow.innerHTML = `
+          <td colspan="3">Total</td>
+          <td class="bold">₹ ${totalAmount.toLocaleString('en-IN')}</td>
+        `;
+        previewTable.appendChild(totalRow);
+      });
+
+      // Print buttons
+      document.getElementById('printLetter').addEventListener('click', function() {
+        window.print();
+      });
+
+      document.getElementById('printPreview').addEventListener('click', function() {
+        window.print();
+      });
+      
+      // Download as Image functionality
+      function downloadLetterAsImage() {
+        const element = document.getElementById('letterPreview');
+        
+        // Hide the preview container buttons temporarily
+        const previewContainer = document.querySelector('.preview-container');
+        const originalDisplay = previewContainer.style.display;
+        previewContainer.style.display = 'none';
+        
+        // Use html2canvas to capture the letter
+        html2canvas(element, {
+          scale: 2, // Higher quality
+          logging: false,
+          useCORS: true, // For external images
+          allowTaint: true
+        }).then(canvas => {
+          // Restore the preview container
+          previewContainer.style.display = originalDisplay;
+          
+          // Create download link
+          const link = document.createElement('a');
+          link.download = 'Letter-of-Intent.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        }).catch(err => {
+          console.error('Error generating image:', err);
+          previewContainer.style.display = originalDisplay;
+          alert('Error generating image. Please try again.');
+        });
+      }
+      
+      // Add event listeners to both download buttons
+      document.getElementById('downloadImage').addEventListener('click', downloadLetterAsImage);
+      document.getElementById('downloadPreview').addEventListener('click', downloadLetterAsImage);
+    });
+	
+	// Update preview
+const updatePreviewBtn = document.getElementById('updatePreview');
+
+updatePreviewBtn.addEventListener('click', function() {
+  // ... (keep all the existing update code for other sections)
+
+  // Update products table
+  const previewTable = document.getElementById('previewProductsTable').querySelector('tbody');
+  previewTable.innerHTML = ''; // Clear existing rows
+  
+  let totalAmount = 0;
+  
+  // Get all product rows from admin panel
+  const productRows = document.querySelectorAll('#productsTableBody tr');
+  
+  // Loop through each product row and add to preview
+  productRows.forEach(row => {
+    const productName = row.querySelector('.product-name').value;
+    const quantity = row.querySelector('.product-quantity').value;
+    const price = row.querySelector('.product-price').value;
+    const amount = row.querySelector('.product-amount').value;
+    
+    // Try to extract numeric value from amount for total calculation
+    const amountValue = parseFloat(amount.replace(/[^0-9.]/g, '')) || 0;
+    totalAmount += amountValue;
+    
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+      <td>${productName}</td>
+      <td>${quantity}</td>
+      <td>${price}</td>
+      <td>${amount}</td>
+    `;
+    previewTable.appendChild(newRow);
+  });
+  
+  // Add total row
+  const totalRow = document.createElement('tr');
+  totalRow.innerHTML = `
+    <td colspan="3">Total</td>
+    <td class="bold">₹ ${totalAmount.toLocaleString('en-IN')}</td>
+  `;
+  previewTable.appendChild(totalRow);
+});
+  </script>	
+</body>
+</html>
